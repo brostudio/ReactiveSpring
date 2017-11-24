@@ -10,11 +10,10 @@ import java.util.*
 import java.util.stream.Stream
 
 @SpringBootApplication
-class ReactiveApplication
+class ReactiveApplication {
 
-fun main(args: Array<String>) {
     @Bean
-    fun addInitialEmployees(employeeRepository: EmployeeRepository) = CommandLineRunner {
+    fun init(employeeRepository: EmployeeRepository) = CommandLineRunner {
         employeeRepository.deleteAll()
                 .subscribe(null, null, {
                     Stream.of(
@@ -22,7 +21,7 @@ fun main(args: Array<String>) {
                             Employee(UUID.randomUUID().toString(), "Marcin Nowakowski", 100_000L),
                             Employee(UUID.randomUUID().toString(), "Marcin Nowakowski", 100_000L)
                     ).forEach { employee ->
-                        {
+                        run {
                             employeeRepository
                                     .save(employee)
                                     .subscribe(System.out::println)
@@ -31,5 +30,8 @@ fun main(args: Array<String>) {
                 })
     }
 
+}
+
+fun main(args: Array<String>) {
     runApplication<ReactiveApplication>(*args)
 }

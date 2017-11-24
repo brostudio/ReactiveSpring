@@ -37,6 +37,9 @@ repositories {
     maven { url "https://repo.spring.io/milestone" }
 }
 
+configurations {
+    dev
+}
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
@@ -45,4 +48,6 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-reflect")
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('io.projectreactor:reactor-test')
+
+    dev("org.springframework.boot:spring-boot-devtools")
 }
