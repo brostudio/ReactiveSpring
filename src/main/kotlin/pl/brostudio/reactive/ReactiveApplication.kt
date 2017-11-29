@@ -18,8 +18,8 @@ class ReactiveApplication {
                 .subscribe(null, null, {
                     Stream.of(
                             Employee(UUID.randomUUID().toString(), "Marcin Nowakowski", 100_000L),
-                            Employee(UUID.randomUUID().toString(), "Marcin Nowakowski", 100_000L),
-                            Employee(UUID.randomUUID().toString(), "Marcin Nowakowski", 100_000L)
+                            Employee(UUID.randomUUID().toString(), "Lukasz Bartosz", 20_000L),
+                            Employee(UUID.randomUUID().toString(), "Ola Rusinska", 145_000L)
                     ).forEach { employee ->
                         run {
                             employeeRepository
