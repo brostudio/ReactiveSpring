@@ -4,8 +4,8 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import pl.brostudio.reactive.entities.Employee
-import pl.brostudio.reactive.repositories.EmployeeRepository
+import pl.brostudio.reactive.entities.TemperatureSensor
+import pl.brostudio.reactive.repositories.IoTRepository
 import java.util.*
 import java.util.stream.Stream
 
@@ -13,17 +13,17 @@ import java.util.stream.Stream
 class ReactiveApplication {
 
     @Bean
-    fun init(employeeRepository: EmployeeRepository) = CommandLineRunner {
-        employeeRepository.deleteAll()
+    fun init(iotRepository: IoTRepository) = CommandLineRunner {
+        iotRepository.deleteAll()
                 .subscribe(null, null, {
                     Stream.of(
-                            Employee(UUID.randomUUID().toString(), "Marcin Nowakowski", 100_000L),
-                            Employee(UUID.randomUUID().toString(), "Lukasz Bartosz", 20_000L),
-                            Employee(UUID.randomUUID().toString(), "Ola Rusinska", 145_000L)
-                    ).forEach { employee ->
+                            TemperatureSensor(UUID.randomUUID().toString(), 21.3F),
+                            TemperatureSensor(UUID.randomUUID().toString(), 24.5F),
+                            TemperatureSensor(UUID.randomUUID().toString(), 22.1F)
+                    ).forEach { sensorData ->
                         run {
-                            employeeRepository
-                                    .save(employee)
+                            iotRepository
+                                    .save(sensorData)
                                     .subscribe(System.out::println)
                         }
                     }

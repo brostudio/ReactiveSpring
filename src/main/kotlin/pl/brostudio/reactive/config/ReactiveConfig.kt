@@ -10,14 +10,13 @@ class ReactiveConfig {
     @Bean
     fun routerFunction(routerHandler: RouterHandler) =
             router {
-                "/rest/employee".nest {
+                "/iot".nest {
                     GET("/all", routerHandler::getAll)
                     "/{id}".nest {
                         GET("/", routerHandler::getId)
-                        GET("/events", routerHandler::getEvents)
+                        //GET("/events", routerHandler::getEvents)
                     }
                 }
-
             }
 
 }
