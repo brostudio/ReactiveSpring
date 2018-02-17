@@ -12,8 +12,9 @@ import java.util.stream.Stream
 @SpringBootApplication
 class ReactiveApplication {
 
+/*
     @Bean
-    fun init(iotRepository: IoTRepository) = CommandLineRunner {
+    fun init(iotRepository: IoTRepository<TemperatureSensor>) = CommandLineRunner {
         iotRepository.deleteAll()
                 .subscribe(null, null, {
                     Stream.of(
@@ -29,6 +30,7 @@ class ReactiveApplication {
                     }
                 })
     }
+*/
 
 }
 
