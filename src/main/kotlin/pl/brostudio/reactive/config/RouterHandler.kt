@@ -41,12 +41,10 @@ class RouterHandler(val iotRepository: IoTRepository<TemperatureSensor>) {
                     }
                 }
                 .switchIfEmpty(
-                        iotDevice
-                                .flatMap {
-                                    logger.info(String.format("New device was added with ID: %s", it.id))
-                                    iotRepository.save(it)
-                                }
-                                .flatMap { ServerResponse.ok().build() }
+                        iotDevice.flatMap {
+                            logger.info(String.format("New device was added with ID: %s", it.id))
+                            ServerResponse.ok().body(iotRepository.save(it))
+                        }
                 )
     }
 

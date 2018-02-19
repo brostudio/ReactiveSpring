@@ -6,12 +6,15 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.ApplicationContext
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.BodyInserters
 import pl.brostudio.reactive.entities.TemperatureSensor
 import pl.brostudio.reactive.repositories.IoTRepository
 import reactor.core.publisher.Flux
@@ -23,7 +26,7 @@ import java.util.*
 class RouterConfigTest {
 
     @Autowired
-    lateinit var routerHandler: RouterHandler
+    lateinit var context:ApplicationContext;
 
     lateinit var webTestClient: WebTestClient
 
@@ -38,7 +41,11 @@ class RouterConfigTest {
 
     @Before
     fun init() {
-        webTestClient = WebTestClient.bindToRouterFunction(ReactiveConfig::routerFunction).build();
+        webTestClient = WebTestClient
+                .bindToApplicationContext(context)
+                .configureClient()
+                .baseUrl("http://localhost:8080/")
+                .build();
         //employeeRepository.deleteAll().block();
     }
 
@@ -47,10 +54,11 @@ class RouterConfigTest {
         given(employeeRepository.findAll()).willReturn(Flux.fromIterable(testSensorsData))
         webTestClient.get()
                 .uri("/iot/all")
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk
                 .expectBody()
-                .jsonPath("$[0].name").isEqualTo("John Smith")
+                .jsonPath("$[0].temp").isEqualTo(testSensorsData.first().temp)
                 .jsonPath("$.length()").isEqualTo(testSensorsData.size)
     }
 
@@ -68,10 +76,27 @@ class RouterConfigTest {
 
 /*
     @Test
+    fun shouldNotAddDeviceWhenExists() {
+        webTestClient.put()
+                .uri("/iot/addDevice")
+                .body(BodyInserters.fromObject(testSensorsData.first().toMono()))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TemperatureSensor::class.java)
+                .isEqualTo(testSensorsData.last())
+    }
+*/
+
+/*
+    @Test
     fun shouldAddDevice() {
         webTestClient.put()
                 .uri("/iot/addDevice")
-                .
+                .body(BodyInserters.fromObject(testSensorsData.furst().toMono()))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TemperatureSensor::class.java)
+                .isEqualTo(testSensorsData.last())
     }
 */
 

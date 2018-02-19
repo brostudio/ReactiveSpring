@@ -4,6 +4,8 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.web.reactive.function.server.router
+import pl.brostudio.reactive.config.RouterHandler
 import pl.brostudio.reactive.entities.TemperatureSensor
 import pl.brostudio.reactive.repositories.IoTRepository
 import java.util.*
@@ -11,6 +13,19 @@ import java.util.stream.Stream
 
 @SpringBootApplication
 class ReactiveApplication {
+
+    @Bean
+    fun routerFunction(routerHandler: RouterHandler) =
+            router {
+                "/iot".nest {
+                    GET("/all", routerHandler::getAll)
+                    "/{id}".nest {
+                        GET("/", routerHandler::getId)
+                        //GET("/events", routerHandler::getEvents)
+                    }
+                    PUT("/addDevice", routerHandler::addDevice)
+                }
+            }
 
 /*
     @Bean
