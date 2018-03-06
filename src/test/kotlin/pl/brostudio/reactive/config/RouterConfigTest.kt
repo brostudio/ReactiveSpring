@@ -6,8 +6,6 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.ApplicationContext
@@ -26,12 +24,12 @@ import java.util.*
 class RouterConfigTest {
 
     @Autowired
-    lateinit var context:ApplicationContext;
+    lateinit var context:ApplicationContext
 
     lateinit var webTestClient: WebTestClient
 
     @MockBean
-    lateinit var employeeRepository: IoTRepository<TemperatureSensor>
+    lateinit var employeeRepository: IoTRepository
 
     val testSensorsData = listOf(
             TemperatureSensor(UUID.randomUUID().toString(), 21.3F),
@@ -45,7 +43,7 @@ class RouterConfigTest {
                 .bindToApplicationContext(context)
                 .configureClient()
                 .baseUrl("http://localhost:8080/")
-                .build();
+                .build()
         //employeeRepository.deleteAll().block();
     }
 
@@ -74,18 +72,30 @@ class RouterConfigTest {
                 .jsonPath("$.length()").isEqualTo(1)
     }
 
-/*
     @Test
     fun shouldNotAddDeviceWhenExists() {
-        webTestClient.put()
+        webTestClient.post()
                 .uri("/iot/addDevice")
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(testSensorsData.first().toMono()))
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(TemperatureSensor::class.java)
-                .isEqualTo(testSensorsData.last())
+                .expectBody()
+                .jsonPath("$[0].temp").isEqualTo(testSensorsData.first().temp)
+                .jsonPath("$[0].id").isEqualTo(testSensorsData.first().id)
     }
-*/
+
+    @Test
+    fun shouldRemoveDeviceWhenExists() {
+        webTestClient.delete()
+                .uri("/iot/remove/{id}", testSensorsData.first().id)
+                .exchange()
+                .expectStatus().isAccepted()
+                .expectBody()
+                .jsonPath("$[0].temp").isEqualTo(testSensorsData.first().temp)
+                .jsonPath("$[0].id").isEqualTo(testSensorsData.first().id)
+    }
+
 
 /*
     @Test

@@ -5,13 +5,19 @@ import org.springframework.web.reactive.function.BodyExtractors.toMono
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
+import pl.brostudio.reactive.entities.IoTEvent
 import pl.brostudio.reactive.entities.TemperatureSensor
 import pl.brostudio.reactive.repositories.IoTRepository
+import pl.brostudio.reactive.repositories.IotEventRepository
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
+import java.util.*
 import java.util.logging.Logger
 
 @Component
-class RouterHandler(val iotRepository: IoTRepository<TemperatureSensor>) {
+class RouterHandler(
+        val iotRepository: IoTRepository,
+        val iotEventRepository: IotEventRepository){
 
     companion object {
         val logger = Logger.getLogger(this::class.java.simpleName)
@@ -32,7 +38,9 @@ class RouterHandler(val iotRepository: IoTRepository<TemperatureSensor>) {
         val iotDevice = serverRequest.body(toMono(TemperatureSensor::class.java)).cache()
 
         return iotDevice
-                .flatMap { iotRepository.findById(it.id) }
+                .flatMap {
+                    iotRepository.findById(it.id)
+                }
                 .flatMap {
                     iotDevice.flatMap {
                         val errorMsg = String.format("Device exists with ID: %s", it.id)
@@ -46,6 +54,34 @@ class RouterHandler(val iotRepository: IoTRepository<TemperatureSensor>) {
                             ServerResponse.ok().body(iotRepository.save(it))
                         }
                 )
+    }
+
+    fun getEventById(serverRequest: ServerRequest): Mono<ServerResponse> {
+        val id: String = serverRequest.pathVariable("id")
+        return ServerResponse.ok()
+                .body(iotEventRepository.findById(iotRepository.findById(id).toMono()))
+    }
+
+    fun event(serverRequest: ServerRequest): Mono<ServerResponse> {
+        val iotDevice = serverRequest.body(toMono(TemperatureSensor::class.java)).cache()
+
+        return iotDevice
+                .flatMap {
+                    iotRepository.findById(it.id)
+                }.flatMap {
+                    val event = IoTEvent(it, Date())
+                    ServerResponse.ok().body(iotEventRepository.save(event))
+                }
+                .switchIfEmpty(
+                        ServerResponse.badRequest().syncBody("Temperature sensor data is not valid for device: ${iotDevice}")
+                )
+
+    }
+
+    fun remove(serverRequest: ServerRequest): Mono<ServerResponse> {
+        val id: String = serverRequest.pathVariable("id")
+        return ServerResponse.ok()
+                .body(iotRepository.deleteById(id))
     }
 
 /*

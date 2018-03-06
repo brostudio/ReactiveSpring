@@ -2,6 +2,7 @@ package pl.brostudio.reactive.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.io.Serializable
 
 @Document
-data class TemperatureSensor (@Id val id:String, val temp:Float) : IoT
+data class TemperatureSensor (@Id val id:String, val temp:Float) : Serializable
