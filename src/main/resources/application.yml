@@ -13,3 +13,12 @@ spring:
 logging:
   level:
     org.springframework.web: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+endpoints:
+  prometheus:
+    enabled: true

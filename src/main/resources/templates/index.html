@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IoT Application</title>
+</head>
+<body>
+<h1>IoT Application test</h1>
+<dl>
+    <dt>Current IoT Device</dt>
+    <dd>
+        <span th:text="${iotDevicesCount}">title</span>
+    </dd>
+
+    <dt>Change number of devices to:</dt>
+    <dd>
+        <input type="text" th:value="${iotDevicesCount}"></input>
+
+    </dd>
+
+</dl>
+</body>
+</html>
